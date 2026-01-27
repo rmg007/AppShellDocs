@@ -1,0 +1,10 @@
+run = "bash scripts/validate-phase-0.sh"
+
+[nix]
+channel = "stable-23_11"
+
+[deps]
+pkgs.flutter
+pkgs.nodejs-18_x
+pkgs.bashInteractive
+pkgs.git

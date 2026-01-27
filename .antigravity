@@ -1,0 +1,42 @@
+---
+description: Universal AI Agent Protocol (Antigravity/Cursor)
+globs: 
+---
+# AI AGENT PROTOCOL
+
+> **CRITICAL INSTRUCTION**: This file governs your behavior. Read it completely before taking ANY action.
+
+## 1. The Supreme Law
+The file `AGENTS.md` in the workspace root (or `AppShell/docs/AGENTS.md`) is your **PRIMARY DIRECTIVE**.
+- You must follow its "Execution Protocol" exactly.
+- You must NOT deviate from the Tech Stack defined therein.
+- If this rule conflicts with `AGENTS.md`, `AGENTS.md` wins.
+
+## 2. State Awareness
+Before writing code or running commands, you MUST read `PHASE_STATE.json`.
+- **Identify** the `current_phase`.
+- **Check** for `blocked_on` status.
+- **Verify** `validation_passed` status.
+- **Do NOT** proceed to Phase N+1 until Phase N is marked complete.
+
+## 3. Execution Loop
+1. **Read** `PHASE_STATE.json` and `AGENTS.md`.
+2. **Plan** the smallest atomic step for the current phase.
+3. **Execute** the change (edit files, run commands).
+4. **Validate** using the specific script for the phase (e.g., `scripts/validate-phase-0.ps1`).
+5. **Update** `PHASE_STATE.json` with the result.
+6. **STOP** and ask for user confirmation before moving to the next major phase.
+
+## 4. Forbidden Actions
+- **NO** inventing new frameworks (use what's in `AGENTS.md`).
+- **NO** skipping validation scripts.
+- **NO** deleting user data (DB migrations must be safe).
+- **NO** committing secrets (check `.env` handling).
+
+## 5. Documentation Mapping
+- **Database**: Follow `SCHEMA.md` exactly.
+- **API**: Follow `API_SPEC.md` exactly.
+- **Business Logic**: Follow `DATA_MODEL.md` exactly.
+- **Frontend/Backend Sync**: Follow `FIELD_MAPPING.md` exactly.
+
+If you are unsure, **STOP** and ask the user.
