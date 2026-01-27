@@ -15,6 +15,18 @@
       ],
       "validation_passed": true,
       "notes": "Documentation and scripts created. Ready for Phase 0: Project Bootstrap."
+    },
+    "0": {
+      "timestamp": "2026-01-27T10:00:00Z",
+      "files_created": [
+        "student-app/pubspec.yaml",
+        "student-app/.env.example",
+        "admin-panel/package.json",
+        "admin-panel/.env.example",
+        ".gitignore"
+      ],
+      "validation_passed": true,
+      "notes": "Project structure bootstrapped manually. Nested .git folders removed to ensure clean GitHub upload."
     }
   },
   "blocked_on": null,
@@ -54,6 +66,34 @@
       "question": "CI/CD target - GitHub Actions only, or additional deployment targets?",
       "resolution": "GitHub Actions only for MVP. Future: add Vercel for admin-panel, Firebase App Distribution for student-app.",
       "resolved_at": "2026-01-26T20:00:00Z"
+    },
+    {
+      "id": "PC-006",
+      "category": "auth",
+      "question": "Student authentication strategy - 'no auth' vs 'anonymous auth'?",
+      "resolution": "Students use Supabase Anonymous Auth (device-bound, no login UI). This provides auth.uid() for RLS and sync. No student-managed accounts in MVP. See DATA_MODEL.md BR-008.",
+      "resolved_at": "2026-01-27T10:00:00Z"
+    },
+    {
+      "id": "PC-007",
+      "category": "schema",
+      "question": "Should we use a separate user_roles table or profiles.role for RBAC?",
+      "resolution": "Use profiles.role ONLY. Do NOT create a user_roles table. The is_admin() function checks profiles.role = 'admin'. All AGENTS.md code patterns updated to match.",
+      "resolved_at": "2026-01-27T10:00:00Z"
+    },
+    {
+      "id": "PC-008",
+      "category": "api",
+      "question": "Should students use REST /attempts or RPC batch_submit_attempts?",
+      "resolution": "Students use batch_submit_attempts RPC ONLY. REST /attempts is for admin reads only. This ensures idempotency, server-enforced user_id, and proper offline batch handling.",
+      "resolved_at": "2026-01-27T10:00:00Z"
+    },
+    {
+      "id": "PC-009",
+      "category": "schema",
+      "question": "Migration strategy - monolithic vs granular?",
+      "resolution": "Use granular migrations for better maintainability and clarity. Replaced monolithic 20260127000001_initial_schema.sql with 15 granular files.",
+      "resolved_at": "2026-01-27T10:00:00Z"
     }
   ],
   "spec_documents_status": {
@@ -93,6 +133,6 @@
       "realtime": "Supabase Realtime"
     }
   },
-  "last_updated": "2026-01-26T20:00:00Z",
+  "last_updated": "2026-01-27T10:00:00Z",
   "last_error": null
 }

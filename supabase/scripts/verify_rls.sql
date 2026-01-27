@@ -28,7 +28,10 @@ DECLARE
         'questions',
         'attempts',
         'sessions',
-        'skill_progress'
+        'skill_progress',
+        'outbox',
+        'sync_meta',
+        'curriculum_meta'
     ];
     tbl TEXT;
     rls_enabled BOOLEAN;
@@ -69,6 +72,48 @@ BEGIN
         RAISE NOTICE 'SKIP: is_admin() function does not exist yet (expected in Phase 1)';
     ELSE
         RAISE NOTICE 'PASS: is_admin() function exists.';
+    END IF;
+END $$;
+
+-- ---------------------------------------------------------------------------
+-- 2b. Verify handle_new_user() function and trigger exist
+-- ---------------------------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_proc 
+        WHERE proname = 'handle_new_user' 
+        AND pronamespace = 'public'::regnamespace
+    ) THEN
+        RAISE NOTICE 'SKIP: handle_new_user() function does not exist yet (expected in Phase 1)';
+    ELSE
+        RAISE NOTICE 'PASS: handle_new_user() function exists.';
+    END IF;
+    
+    -- Check for the trigger on auth.users
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger 
+        WHERE tgname = 'on_auth_user_created'
+    ) THEN
+        RAISE NOTICE 'SKIP: on_auth_user_created trigger does not exist yet (expected in Phase 1)';
+    ELSE
+        RAISE NOTICE 'PASS: on_auth_user_created trigger exists.';
+    END IF;
+END $$;
+
+-- ---------------------------------------------------------------------------
+-- 2c. Verify batch_submit_attempts() RPC exists
+-- ---------------------------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_proc 
+        WHERE proname = 'batch_submit_attempts' 
+        AND pronamespace = 'public'::regnamespace
+    ) THEN
+        RAISE NOTICE 'SKIP: batch_submit_attempts() function does not exist yet (expected in Phase 1)';
+    ELSE
+        RAISE NOTICE 'PASS: batch_submit_attempts() function exists.';
     END IF;
 END $$;
 

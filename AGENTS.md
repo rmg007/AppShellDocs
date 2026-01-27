@@ -68,6 +68,9 @@ If a requirement is not explicitly defined in `AGENTS.md` or `SCHEMA.md`:
 - **Streak Multiplier**: 1x (1-2), 1.5x (3-4), 2x (5+), resets on incorrect
 - **Question Types**: multiple_choice, mcq_multi, text_input, boolean, reorder_steps
 - **Design System**: shadcn/ui for Admin Panel
+- **Student Auth**: Anonymous auth (device-bound, no login UI) - see `DATA_MODEL.md` BR-008
+- **RBAC**: Use `profiles.role` only (NOT a separate `user_roles` table)
+- **Attempt Submission**: Students use `batch_submit_attempts` RPC only (NOT REST `/attempts`)
 
 ---
 
