@@ -6,6 +6,18 @@
 
 ---
 
+## File Authority Order (Read in this order)
+
+1. `AGENTS.md` - The Execution Contract (this file) - **READ FIRST**
+2. `supabase/migrations/*.sql` - Executable database schema
+3. `AppShell/docs/SCHEMA.md` - Database reference
+4. `AppShell/docs/specs/*.md` - Detailed specifications
+5. Code implementations
+
+**Conflict Resolution**: If documents disagree, higher-numbered sources override lower ones. If still unclear, STOP and ask.
+
+---
+
 ## Non-Negotiable Rules
 
 1. **No freelancing**. Do not introduce new libraries, patterns, or architecture choices not explicitly approved here.
@@ -17,6 +29,29 @@
    - Track `current_phase`, `completed_phases`, `files_created`, `validation_passed`.
    - Support resume/rollback capabilities.
    - Update state after each validation checkpoint.
+
+**PHASE_STATE.json Schema**:
+```json
+{
+  "current_phase": "string (phase number, e.g., '0', '1', ...)",
+  "completed_phases": "array of strings (e.g., ['-1', '0'])",
+  "phase_artifacts": {
+    "phase_key": {
+      "timestamp": "ISO 8601 string",
+      "files_created": "array of strings (file paths)",
+      "validation_passed": "boolean",
+      "notes": "string (optional)"
+    }
+  },
+  "blocked_on": "string or null (reason if stuck)",
+  "pending_clarifications": "array of objects (questions awaiting answers)",
+  "resolved_clarifications": "array of objects (answered questions)",
+  "spec_documents_status": "object (spec completion status)",
+  "tech_stack": "object (locked versions)",
+  "last_updated": "ISO 8601 string",
+  "last_error": "string or null"
+}
+```
 
 ---
 
@@ -716,7 +751,14 @@ class SyncService extends StateNotifier<SyncState> {
         switch (item.action) {
           case 'INSERT':
           case 'UPSERT':
-            await supabase.from(item.tableName).upsert(payload);
+            if (item.tableName == 'attempts') {
+              // Attempts must use RPC, not REST
+              await supabase.rpc('batch_submit_attempts', {
+                attempts_json: [payload]
+              });
+            } else {
+              await supabase.from(item.tableName).upsert(payload);
+            }
             break;
           case 'DELETE':
             await supabase.from(item.tableName).delete().eq('id', item.recordId);

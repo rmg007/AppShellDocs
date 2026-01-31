@@ -200,7 +200,7 @@ ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
 
 ### F. Skill Progress Aggregates (`skill_progress`)
 
-*Pre-computed progress per student per skill. Updated on each attempt. Critical for mastery tracking.*
+*Pre-computed progress per student per skill. Computed server-side on each attempt. Clients read-only. Critical for mastery tracking.*
 
 ```sql
 CREATE TABLE public.skill_progress (
@@ -234,7 +234,7 @@ CREATE INDEX idx_skill_progress_user_id ON public.skill_progress(user_id);
 CREATE INDEX idx_skill_progress_skill_id ON public.skill_progress(skill_id);
 CREATE INDEX idx_skill_progress_updated_at ON public.skill_progress(updated_at);
 
--- RLS: Students can read/update own progress. Admins can read all.
+-- RLS: Students can read own progress. Admins can read all.
 ALTER TABLE public.skill_progress ENABLE ROW LEVEL SECURITY;
 ```
 
@@ -387,17 +387,9 @@ CREATE POLICY "Admins can view all sessions" ON public.sessions
 
 **5. Skill Progress Table**
 ```sql
--- Students can insert their own progress
-CREATE POLICY "Students can insert own progress" ON public.skill_progress
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-
 -- Students can view their own progress
 CREATE POLICY "Students can view own progress" ON public.skill_progress
   FOR SELECT USING (auth.uid() = user_id);
-
--- Students can update their own progress
-CREATE POLICY "Students can update own progress" ON public.skill_progress
-  FOR UPDATE USING (auth.uid() = user_id);
 
 -- Admins can view all progress
 CREATE POLICY "Admins can view all progress" ON public.skill_progress
@@ -517,7 +509,7 @@ CREATE TRIGGER on_auth_user_created
 ### Atomic Publish Curriculum
 
 ```sql
-CREATE OR REPLACE FUNCTION public.publish_curriculum()
+CREATE OR REPLACE FUNCTION public.publish_curriculum(domain_ids UUID[])
 RETURNS void AS $$
 BEGIN
   -- Verify caller is admin
@@ -525,34 +517,47 @@ BEGIN
     RAISE EXCEPTION 'Unauthorized: Only admins can publish';
   END IF;
 
-  -- Validate: No orphaned skills
+  -- Validate: No orphaned skills for these domains
   IF EXISTS (
     SELECT 1 FROM public.skills s
-    LEFT JOIN public.domains d ON s.domain_id = d.id
-    WHERE d.id IS NULL OR d.deleted_at IS NOT NULL
+    WHERE s.domain_id = ANY(domain_ids)
+    AND (s.deleted_at IS NOT NULL OR NOT EXISTS (
+      SELECT 1 FROM public.domains d WHERE d.id = s.domain_id AND d.deleted_at IS NULL
+    ))
   ) THEN
     RAISE EXCEPTION 'Cannot publish: orphaned skills detected';
   END IF;
 
-  -- Validate: No orphaned questions
+  -- Validate: No orphaned questions for these domains
   IF EXISTS (
     SELECT 1 FROM public.questions q
     LEFT JOIN public.skills s ON q.skill_id = s.id
-    WHERE s.id IS NULL OR s.deleted_at IS NOT NULL
+    WHERE s.domain_id = ANY(domain_ids)
+    AND (q.deleted_at IS NOT NULL OR s.id IS NULL OR s.deleted_at IS NOT NULL)
   ) THEN
     RAISE EXCEPTION 'Cannot publish: orphaned questions detected';
   END IF;
 
-  -- Validate: All published domains have at least one skill
+  -- Validate: All domains have at least one skill
   IF EXISTS (
     SELECT 1 FROM public.domains d
-    WHERE d.is_published = true AND d.deleted_at IS NULL
+    WHERE d.id = ANY(domain_ids) AND d.deleted_at IS NULL
     AND NOT EXISTS (
       SELECT 1 FROM public.skills s 
       WHERE s.domain_id = d.id AND s.deleted_at IS NULL
     )
   ) THEN
     RAISE EXCEPTION 'Cannot publish: empty domains detected';
+  END IF;
+
+  -- Publish the domains
+  UPDATE public.domains
+  SET is_published = true, updated_at = NOW()
+  WHERE id = ANY(domain_ids) AND deleted_at IS NULL;
+
+  -- If no rows updated, means some domains not found
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'One or more domains not found';
   END IF;
 
   -- Bump curriculum version

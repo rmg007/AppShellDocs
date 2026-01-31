@@ -167,7 +167,12 @@ Atomically validates and publishes curriculum.
 
 **Endpoint**: `POST /rpc/publish_curriculum`
 
-**Request**: No parameters
+**Request**:
+```json
+{
+  "domain_ids": ["uuid1", "uuid2"]
+}
+```
 
 **Response**:
 - Success: `null` (void)

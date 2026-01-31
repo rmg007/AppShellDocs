@@ -1,12 +1,11 @@
 # AGENTS.md (Root Copy)
 
-> **IMPORTANT**: This is a convenience copy. The canonical source of truth is:
-> `AppShell/docs/AGENTS.md`
+> **IMPORTANT**: This is a sanctioned summary of the canonical execution contract.
+> `AppShell/docs/AGENTS.md` is the source of truth.
 >
-> If this file conflicts with `AppShell/docs/AGENTS.md`, the latter takes precedence.
+> If this summary conflicts with `AppShell/docs/AGENTS.md`, the latter takes precedence.
 >
-> **SYNC CHECK**: Before starting work, verify this file matches the canonical version.
-> Run: `diff AGENTS.md AppShell/docs/AGENTS.md` (should show no differences)
+> **SYNC CHECK**: This summary is maintained manually. If outdated, update from canonical.
 
 ---
 
@@ -15,10 +14,14 @@ See [AppShell/docs/AGENTS.md](AppShell/docs/AGENTS.md) for the full Execution Co
 ## Quick Reference
 
 ### File Authority (Read in this order)
-1. `AppShell/docs/AGENTS.md` - The Law (Execution Contract) - **READ FIRST**
-2. `AppShell/docs/SCHEMA.md` - The Database Truth
-3. `PHASE_STATE.json` - The Progress Tracker
-4. `AppShell/docs/specs/*.md` - Detailed Specifications
+1. `AppShell/docs/AGENTS.md` - The Execution Contract - **READ FIRST**
+2. `supabase/migrations/*.sql` - Executable database schema
+3. `AppShell/docs/SCHEMA.md` - Database reference
+4. `PHASE_STATE.json` - The Progress Tracker
+5. `AppShell/docs/specs/*.md` - Detailed Specifications
+6. Code implementations
+
+**Conflict Resolution**: If documents disagree, higher-numbered sources override lower ones. If still unclear, STOP and ask.
 
 ### Tech Stack Summary
 | Component | Student App | Admin Panel |
