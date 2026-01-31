@@ -82,9 +82,9 @@
     {
       "id": "PC-006",
       "category": "auth",
-      "question": "Student authentication strategy - 'no auth' vs 'anonymous auth'?",
-      "resolution": "Students use Supabase Anonymous Auth (device-bound, no login UI). This provides auth.uid() for RLS and sync. No student-managed accounts in MVP. See DATA_MODEL.md BR-008.",
-      "resolved_at": "2026-01-27T10:00:00Z"
+      "question": "Student authentication strategy - anonymous vs explicit accounts?",
+      "resolution": "Students authenticate via Supabase Auth using Email/Password and Google OAuth. Anonymous/device-bound auth is NOT used in MVP. See DATA_MODEL.md BR-008.",
+      "resolved_at": "2026-01-31T12:00:00Z"
     },
     {
       "id": "PC-007",

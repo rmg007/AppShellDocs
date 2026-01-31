@@ -102,36 +102,33 @@ ELSE:
 - **Database Maintenance**: Run `VACUUM;` on local Drift DB every ~50 launches.
 - **Content Integrity**: Server provides SHA-256 checksum of published content; client validates after sync. Mismatch triggers full re-download.
 
-### BR-008: Device-Bound Anonymous Authentication
+### BR-008: Student Authentication (Email/Password + Google OAuth)
 
-Students do **NOT** see a login screen. Authentication happens silently to enable backend sync and RLS.
+Students sign in with an Email/Password account or via Google OAuth. This provides persistent identity, recovery options, and a clear upgrade path.
 
 **On First App Launch**:
 1. Check for existing session in secure storage (`flutter_secure_storage`)
-2. If no session exists, call `supabase.auth.signInAnonymously()`
-3. Store the session refresh token in secure local storage
-4. A `profiles` row is auto-created via database trigger (role = 'student')
+2. If no session exists, present the login UI to the student (email/password) or offer Google Sign-In
+3. After successful sign-in, persist the session refresh token in secure local storage
+4. A `profiles` row is auto-created via database trigger (role = 'student') when the auth user is created
 
 **On Subsequent Launches**:
-1. Restore session from secure storage via `supabase.auth.recoverSession()`
-2. If session is expired/invalid, Supabase auto-refreshes using the refresh token
-3. If refresh fails (e.g., >7 days offline), call `signInAnonymously()` again
+1. Restore session from secure storage via `supabase.auth.recoverSession()` or client SDK equivalent
+2. If session is expired, refresh using the refresh token
+3. If refresh fails, prompt the user to re-authenticate via email/password or Google OAuth
 
 **Important Behaviors**:
-- Anonymous users get a real `auth.uid()` that works with RLS policies
+- Authenticated users get a real `auth.uid()` that works with RLS policies
 - The `user_id` in `attempts`, `sessions`, `skill_progress` is auto-assigned via `DEFAULT auth.uid()` in the database
 - Client code MUST NOT send `user_id` in API payloads—the server enforces it
-- Anonymous accounts can be upgraded to full accounts later (Future Feature)
-
-**Data Orphaning on Re-Auth**:
-- If app is reinstalled or secure storage is cleared, a NEW anonymous user is created
-- Previous local data is orphaned (no way to link without account)
-- MVP behavior: Start fresh. Future: Prompt user to create account before data loss scenarios.
 
 **Session Persistence**:
 - Use `flutter_secure_storage` package (encrypted on device)
 - Key: `supabase_session`
 - Value: JSON-encoded session from `session.persistSessionString`
+
+**Upgrade Path**:
+- If supporting social/OAuth sign-in, consider account linking to avoid orphaning local data during migration.
 
 ---
 

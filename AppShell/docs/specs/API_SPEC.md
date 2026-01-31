@@ -26,20 +26,24 @@ This document defines the API contracts between:
 - **Provider**: Supabase Auth
 - **Methods**:
   - **Admin Panel**: Email/Password login
-  - **Student App**: Anonymous Auth (device-bound, no login UI) - see `DATA_MODEL.md` BR-008
+  - **Student App**: Email/Password + Google OAuth (see `DATA_MODEL.md` BR-008)
 - **Token Format**: JWT (expires in 1 hour, auto-refreshes via refresh token)
 - **Header**: `Authorization: Bearer <access_token>`
 - **API Key Header**: `apikey: <anon_key>`
 
-**Anonymous Auth Flow (Student App)**:
+**Student Auth Flow (Email/Password or Google OAuth)**:
 ```dart
-// First launch - create anonymous session
-final response = await supabase.auth.signInAnonymously();
-// Session is auto-created, auth.uid() is now available
-// A profiles row is auto-created via database trigger
+// Example: Email/password sign in
+final response = await supabase.auth.signInWithPassword(
+  email: 'student@example.com',
+  password: 'your-password'
+);
+
+// Example: Google OAuth (redirect/PKCE flow may apply depending on platform)
+final oauth = await supabase.auth.signInWithOAuth(provider: 'google');
 ```
 
-**Important**: Both admin (email/password) and student (anonymous) users get a valid `auth.uid()`. The difference is `profiles.role` = 'admin' vs 'student'.
+**Important**: All authenticated users receive a valid `auth.uid()`; use `profiles.role` to gate admin vs student permissions.
 
 ### Content Type
 All requests and responses use `Content-Type: application/json`

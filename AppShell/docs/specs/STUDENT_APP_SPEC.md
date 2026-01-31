@@ -35,7 +35,7 @@ dependencies:
   flutter_riverpod: ^2.5.0
   riverpod_annotation: ^2.3.0
   supabase_flutter: ^2.0.0
-  flutter_secure_storage: ^9.0.0  # For anonymous session persistence
+  flutter_secure_storage: ^9.0.0  # For session persistence
   drift: ^2.15.0
   sqlite3_flutter_libs: ^0.5.0
   connectivity_plus: ^6.0.0
@@ -97,7 +97,7 @@ lib/
 │   │       └── sync_meta_table.dart
 │   │
 │   ├── features/
-│   │   ├── auth/                    # Anonymous auth service (no UI)
+│   │   ├── auth/                    # Auth service (login UI)
 │   │   ├── curriculum/
 │   │   │   ├── domain_list_screen.dart
 │   │   │   ├── skill_list_screen.dart
@@ -385,14 +385,12 @@ class AuthService {
       }
     }
     
-    // No valid session - create anonymous session
-    final response = await _supabase.auth.signInAnonymously();
-    
-    if (response.session != null) {
-      await _persistSession(response.session!);
-    } else {
-      throw Exception('Failed to create anonymous session');
-    }
+      // No valid session - defer to UI to perform sign-in (email/password or Google OAuth)
+      // Example: after user submits credentials call:
+      // final response = await _supabase.auth.signInWithPassword(email: email, password: password);
+      // or for OAuth:
+      // final response = await _supabase.auth.signInWithOAuth(provider: 'google');
+      // Persist session after successful sign-in
   }
   
   /// Persist session to secure storage for later recovery

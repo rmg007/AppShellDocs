@@ -1,7 +1,6 @@
 -- Migration: 20260127000013_create_triggers.sql
 -- Description: Create triggers for updated_at and user creation
 
--- Auto-update updated_at timestamp function
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -10,7 +9,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Auto-create profile for new auth users (including anonymous)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -18,14 +16,13 @@ BEGIN
   VALUES (
     NEW.id,
     'student',
-    COALESCE(NEW.email, 'anonymous-' || NEW.id::text || '@device.local'),
+    COALESCE(NEW.email, 'user-' || NEW.id::text || '@example.local'),
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'Student')
   );
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger: Auto-create profile on auth.users insert
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users

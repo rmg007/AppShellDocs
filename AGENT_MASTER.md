@@ -791,19 +791,25 @@ describe('DomainForm', () => {
 
 ### ❌ Student Authentication
 
-**WRONG**: Create a login screen for students with Email/Password
+**WRONG**: Rely on anonymous/device-bound sessions for students in production
 ```dart
 // DON'T DO THIS
-await supabase.auth.signInWithPassword(email: email, password: password);
-```
-
-**RIGHT**: Use Supabase Anonymous Auth (device-bound, no login UI)
-```dart
-// DO THIS
 await supabase.auth.signInAnonymously();
 ```
 
-**Why**: Students don't need accounts. Anonymous auth provides auth.uid() for RLS and sync.
+**RIGHT**: Require authenticated sessions via Email/Password or Google OAuth
+```dart
+// Email/password
+final res = await supabase.auth.signInWithPassword(
+  email: 'student@example.com',
+  password: 'your-password'
+);
+
+// Google OAuth
+final oauth = await supabase.auth.signInWithOAuth(provider: 'google');
+```
+
+**Why**: Explicit auth provides better account recovery, user identity, and avoids orphaned local data. Use `profiles.role` and RLS to gate access.
 
 ### ❌ Direct Status Changes
 
@@ -995,7 +1001,7 @@ All past decisions with rationale:
 | PC-003 | Point scoring with streaks? | Base points × streak multiplier (1x, 1.5x, 2x) | Gamification without complexity | 2026-01-26 |
 | PC-004 | Admin Panel design system? | shadcn/ui + Tailwind | Accessible, customizable, fast setup | 2026-01-26 |
 | PC-005 | CI/CD target? | GitHub Actions only for MVP | Simple, free, sufficient | 2026-01-26 |
-| PC-006 | Student authentication? | Supabase Anonymous Auth (device-bound) | Provides auth.uid() for RLS and sync | 2026-01-27 |
+| PC-006 | Student authentication? | Email/Password + Google OAuth (Supabase Auth) | Provides auth.uid() for RLS and sync; no anonymous auth in MVP | 2026-01-31 |
 | PC-007 | User roles table? | Use `profiles.role` ONLY | Simpler, `is_admin()` checks profiles.role | 2026-01-27 |
 | PC-008 | Student attempt submission? | Use `batch_submit_attempts` RPC ONLY | Idempotent, secure, handles offline batches | 2026-01-27 |
 | PC-009 | Migration strategy? | Granular (15 files) not monolithic | Better maintainability, clearer diffs | 2026-01-27 |

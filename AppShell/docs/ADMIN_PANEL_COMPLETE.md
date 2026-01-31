@@ -1561,7 +1561,7 @@ export function InvitationsPage() {
 - [ ] shadcn/ui components initialized
 - [ ] Supabase RLS policies respected
 - [ ] Soft deletes for offline sync compatibility
-- [ ] Anonymous auth for students (separate from admin auth)
+ - [ ] Student auth for students configured (Email/Password + Google OAuth)
 
 ### Validation Steps
 1. Run `npm run lint` and `npm run build` - no errors
@@ -1572,7 +1572,7 @@ export function InvitationsPage() {
 
 ### Key Business Rules
 - **Admin Auth**: Check `profiles.role` only (NOT separate `user_roles` table)
-- **Student Auth**: Anonymous auth with device-bound sessions
+- **Student Auth**: Email/Password + Google OAuth (Supabase Auth)
 - **Publishing**: `is_published` cascades from domain → skills → questions
 - **Soft Deletes**: Use `deleted_at` timestamp, never hard delete
 - **Slugs**: Must be `^[a-z0-9_]+$` and unique within scope

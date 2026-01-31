@@ -92,7 +92,7 @@ Students need a way to practice curriculum content offline (in classrooms with l
 
 ### Future Features (Post-MVP)
 - [ ] OAuth login (Google, Apple) for admins
-- [ ] Student account linking (upgrade anonymous to full account for cross-device progress)
+ - [ ] Student account linking (upgrade flow for cross-device progress)
 - [ ] Rich media in questions (images, audio)
 - [ ] Adaptive difficulty
 - [ ] Detailed analytics dashboard
@@ -105,7 +105,7 @@ Students need a way to practice curriculum content offline (in classrooms with l
 
 The following are explicitly **NOT** included in MVP:
 
-1. **Student-managed accounts** - No login screen, email/password, or account recovery for students. Device-bound anonymous authentication is used silently for backend sync (see `DATA_MODEL.md` BR-008). Cross-device progress sync is a future feature.
+1. **Student-managed accounts** - Students sign in via email/password or Google OAuth. Account linking and cross-device progress sync are future features.
 2. **Rich media content** - Questions are text-only for MVP
 3. **Adaptive learning** - Fixed difficulty per question
 4. **Social features** - No leaderboards, sharing, or multiplayer
@@ -161,4 +161,4 @@ This document is COMPLETE. Agents should:
 |------|--------|--------|
 | 2026-01-26 | Agent | Created stub document |
 | 2026-01-26 | Agent | Completed all sections with MVP scope |
-| 2026-01-27 | Agent | Clarified student auth: device-bound anonymous auth for sync, no login UI |
+| 2026-01-31 | Agent | Clarified student auth: Email/Password + Google OAuth; no anonymous UID-based auth |

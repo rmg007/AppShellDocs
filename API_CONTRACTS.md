@@ -73,37 +73,27 @@ Content-Type: application/json
 
 ## 2. Authentication
 
-### 2.1 Student Auth (Anonymous)
+### 2.1 Student Auth (Email/Password + Google OAuth)
 
-**Endpoint**: `POST /auth/v1/signup`
+Students authenticate using Supabase Auth via email/password or Google OAuth. Example flows:
 
-**Request** (Anonymous Auth):
-```json
-{
-  "email": null,
-  "password": null
-}
+Email/password (example):
+```javascript
+const { data, error } = await supabase.auth.signInWithPassword({
+  email: 'student@example.com',
+  password: 'your-password'
+});
 ```
 
-**Response**:
-```json
-{
-  "access_token": "eyJhbGc... (device-bound)",
-  "token_type": "bearer",
-  "expires_in": 3600,
-  "refresh_token": "...",
-  "user": {
-    "id": "uuid",
-    "role": "authenticated"
-  }
-}
+Google OAuth (example):
+```javascript
+const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
 ```
 
-**Auto-Created Profile**:
-- Database trigger creates `profiles` row with `role = 'student'`
-- Device-bound session (no persistent login UI)
+Auto-Created Profile:
+- Database trigger creates `profiles` row with `role = 'student'` when a new auth user is created.
 
-**Note**: Students use anonymous auth per PC-006. No email/password required.
+Note: Students should be able to sign up with email/password or via Google OAuth; anonymous/device-bound auth is NOT used.
 
 ### 2.2 Admin Login (Email/Password)
 

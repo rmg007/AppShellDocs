@@ -202,9 +202,9 @@ This runs `supabase/scripts/verify_rls.sh` which:
 1. Checks that `psql` is installed
 2. Connects to local Supabase
 3. Executes `verify_rls.sql` to verify:
-   - RLS is enabled on all required tables
-   - `is_admin()` function exists
-   - Anonymous users cannot write to protected tables
+  - RLS is enabled on all required tables
+  - `is_admin()` function exists
+  - Unauthenticated or non-admin users cannot write to protected tables
 
 Agents **must expand** `verify_rls.sql` as they add new tables and policies.
 

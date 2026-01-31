@@ -2,7 +2,7 @@
 
 ## 1. Design Philosophy
 * **Core Principle:** Offline-First, Local-First data architecture with cloud synchronization. All user data is stored locally first, with conflict-free replication to the cloud.
-* **Constraint:** Must run on tablets without admin rights, support anonymous authentication, and handle network interruptions gracefully.
+* **Constraint:** Must run on tablets without admin rights, support authenticated students (Email/Password + OAuth), and handle network interruptions gracefully.
 
 ## 2. Technology Stack
 | Layer | Technology | Version | Rationale |
@@ -24,7 +24,7 @@
 │                 │    │                 │    │                 │
 │ • Local Drift DB│    │ • React Query   │    │ • Auth/RBAC     │
 │ • Offline Sync  │    │ • CRUD Forms    │    │ • Real-time     │
-│ • Anonymous Auth│    │ • Admin Auth    │    │ • RLS Policies  │
+│ • Student Auth (Email/OAuth) │    │ • Admin Auth    │    │ • RLS Policies  │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
          │                       │                       │
          └───────────────────────┼───────────────────────┘
@@ -43,6 +43,6 @@
 * **File Systems:** Local storage on device for offline data, no external file I/O
 
 ## 5. Security & Compliance
-* **Authentication:** Anonymous auth for students (device-bound), email/password for admins
+* **Authentication:** Email/Password + Google OAuth for students, email/password for admins
 * **Data Protection:** RLS policies enforce access control, all data encrypted in transit and at rest via Supabase
 * **Authorization:** Role-based access (student vs admin) enforced at database level

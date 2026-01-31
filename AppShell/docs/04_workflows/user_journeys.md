@@ -6,7 +6,7 @@
 
 ### Pre-conditions
 1. Student app is installed and has local curriculum data
-2. Student has anonymous auth session
+2. Student has a valid authenticated session (email/password or Google OAuth)
 3. Selected skill has published questions
 
 ### Process Flow (Step-by-Step)
@@ -114,7 +114,7 @@
 2. No existing valid session
 
 ### Process Flow (Step-by-Step)
-1. **System Action:** Attempt anonymous sign-in with Supabase.
+1. **System Action:** Present login UI (email/password) or trigger Google OAuth.
 2. **Data Action:** On success, auto-create profile record if needed.
 3. **System Action:** Store session tokens locally.
 4. **UI Action:** Navigate to main skill selection screen.

@@ -470,9 +470,9 @@ CREATE TRIGGER update_skill_progress_updated_at
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 ```
 
-### Auto-Create Profile for New Users (Including Anonymous)
+### Auto-Create Profile for New Users
 
-*Critical for anonymous auth: When a new user signs up (including via `signInAnonymously()`), this trigger creates their profile row automatically.*
+*Critical: When a new user signs up (via Email/Password or OAuth), this trigger creates their profile row automatically.*
 
 ```sql
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -482,7 +482,7 @@ BEGIN
   VALUES (
     NEW.id,
     'student',
-    COALESCE(NEW.email, 'anonymous-' || NEW.id::text || '@device.local'),
+    COALESCE(NEW.email, 'user-' || NEW.id::text || '@example.local'),
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'Student')
   );
   RETURN NEW;
@@ -490,14 +490,14 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- This trigger fires when a new row is inserted into auth.users
--- It ensures every authenticated user (including anonymous) has a profiles row
+-- It ensures every authenticated user has a profiles row
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 ```
 
 **Why This Matters**:
-- Anonymous students created via `signInAnonymously()` need a `profiles` row
+- Authenticated users created via sign-in need a `profiles` row
 - Without it, the `user_id` FK constraint on `attempts`/`sessions`/`skill_progress` would fail
 - The trigger runs with `SECURITY DEFINER` to bypass RLS
 - Admin users created via Supabase Dashboard also get a profile (role can be updated manually)

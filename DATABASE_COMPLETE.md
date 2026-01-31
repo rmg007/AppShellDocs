@@ -70,7 +70,7 @@ super_admin > admin > student
 ### Auth Model
 
 - **Provider**: Supabase Auth (Email/Password + Google OAuth)
-- **Student Auth**: Anonymous auth (device-bound, no login UI)
+- **Student Auth**: Email/Password + Google OAuth (no anonymous auth)
 - **Admin Registration**: Requires invitation code from super_admin
 - **Profile Creation**: Auto-created via `handle_new_user()` trigger (default role = `student`)
 
@@ -89,10 +89,12 @@ CREATE TYPE public.user_role AS ENUM ('admin', 'student');
 ### content_status
 
 ```sql
-CREATE TYPE public.content_status AS ENUM ('draft', 'live');
+CREATE TYPE public.content_status AS ENUM ('draft', 'live', 'published');
 ```
 
 **Usage**: `domains.status`, `skills.status`, `questions.status`
+
+Note: For backward compatibility this project keeps an `is_published BOOLEAN` on content tables. A database trigger keeps `is_published` synchronized with `status = 'published'` so existing queries using `is_published` continue to work while `status` offers richer lifecycle semantics.
 
 ### question_type
 
@@ -147,6 +149,7 @@ CREATE TABLE public.domains (
   description TEXT,
   sort_order INTEGER DEFAULT 0 NOT NULL,
   status public.content_status DEFAULT 'draft'::public.content_status NOT NULL,
+  is_published BOOLEAN DEFAULT FALSE NOT NULL,  -- kept for backward compatibility; synced with `status`
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   deleted_at TIMESTAMPTZ
@@ -172,6 +175,7 @@ CREATE TABLE public.skills (
   difficulty_level INTEGER DEFAULT 1 CHECK (difficulty_level BETWEEN 1 AND 5),
   sort_order INTEGER DEFAULT 0 NOT NULL,
   status public.content_status DEFAULT 'draft'::public.content_status NOT NULL,
+  is_published BOOLEAN DEFAULT FALSE NOT NULL,  -- kept for backward compatibility; synced with `status`
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   deleted_at TIMESTAMPTZ,
@@ -199,6 +203,7 @@ CREATE TABLE public.questions (
   explanation TEXT,  -- Shown after answering
   points INTEGER DEFAULT 1 NOT NULL,
   status public.content_status DEFAULT 'draft'::public.content_status NOT NULL,
+  is_published BOOLEAN DEFAULT FALSE NOT NULL,  -- kept for backward compatibility; synced with `status`
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   deleted_at TIMESTAMPTZ
@@ -250,9 +255,9 @@ CREATE POLICY "Admins full access to domains" ON public.domains
   USING (is_admin())
   WITH CHECK (is_admin());
 
-CREATE POLICY "Students can read published domains" ON public.domains
+CUSTOM POLICY "Students can read published domains" ON public.domains
   FOR SELECT 
-  USING (status = 'live' AND deleted_at IS NULL);
+  USING (is_published = true AND deleted_at IS NULL);
 
 -- Skills (same pattern)
 CREATE POLICY "Admins full access to skills" ON public.skills
@@ -262,7 +267,7 @@ CREATE POLICY "Admins full access to skills" ON public.skills
 
 CREATE POLICY "Students can read published skills" ON public.skills
   FOR SELECT 
-  USING (status = 'live' AND deleted_at IS NULL);
+  USING (is_published = true AND deleted_at IS NULL);
 
 -- Questions (same pattern)
 CREATE POLICY "Admins full access to questions" ON public.questions
@@ -272,7 +277,7 @@ CREATE POLICY "Admins full access to questions" ON public.questions
 
 CREATE POLICY "Students can read published questions" ON public.questions
   FOR SELECT 
-  USING (status = 'live' AND deleted_at IS NULL);
+  USING (is_published = true AND deleted_at IS NULL);
 ```
 
 ---
