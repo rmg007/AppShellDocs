@@ -14,14 +14,19 @@ See [AppShell/docs/AGENTS.md](AppShell/docs/AGENTS.md) for the full Execution Co
 ## Quick Reference
 
 ### File Authority (Read in this order)
-1. `AppShell/docs/AGENTS.md` - The Execution Contract - **READ FIRST**
-2. `supabase/migrations/*.sql` - Executable database schema
-3. `AppShell/docs/SCHEMA.md` - Database reference
-4. `PHASE_STATE.json` - The Progress Tracker
-5. `AppShell/docs/specs/*.md` - Detailed Specifications
-6. Code implementations
+1. `AGENT_MASTER.md` - The Code of Law - **READ FIRST**
+2. **Domain Guides**:
+   - `DATABASE_COMPLETE.md` - Database & RLS
+   - `API_CONTRACTS.md` - API & Sync
+   - `STUDENT_APP_COMPLETE.md` - Student App Implementation
+   - `ADMIN_PANEL_COMPLETE.md` - Admin Panel Implementation
+3. `AppShell/docs/AGENTS.md` - Original Execution Contract
+4. `supabase/migrations/*.sql` - Executable database schema
+5. `PHASE_STATE.json` - The Progress Tracker
+6. `AppShell/docs/specs/*.md` - Detailed Specifications
+7. Code implementations
 
-**Conflict Resolution**: If documents disagree, higher-numbered sources override lower ones. If still unclear, STOP and ask.
+**Conflict Resolution**: `AGENT_MASTER.md` and Domain Guides override `AppShell/docs/*.md`. If still unclear, STOP and ask.
 
 ### Tech Stack Summary
 | Component | Student App | Admin Panel |

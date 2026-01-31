@@ -201,7 +201,7 @@ if (profile.role !== 'admin') {
   "title": "Physics",
   "description": "Physical sciences",
   "sort_order": 2,
-  "is_published": false,
+  "status": "draft",
   "created_at": "2026-01-29T10:05:00Z",
   "updated_at": "2026-01-29T10:05:00Z",
   "deleted_at": null
@@ -216,7 +216,7 @@ if (profile.role !== 'admin') {
 ```json
 {
   "title": "Updated Title",
-  "is_published": true
+  "status": "live"
 }
 ```
 
@@ -240,7 +240,7 @@ if (profile.role !== 'admin') {
 ```
 ?select=*
 &domain_id=eq.<domain_uuid>
-&is_published=eq.true
+&status=eq.live
 &deleted_at=is.null
 &order=sort_order.asc
 ```
@@ -258,7 +258,7 @@ if (profile.role !== 'admin') {
   "description": "Introduction to algebra",
   "difficulty_level": 1,
   "sort_order": 1,
-  "is_published": false
+  "status": "draft"
 }
 ```
 
@@ -274,7 +274,7 @@ if (profile.role !== 'admin') {
 ```
 ?select=*
 &skill_id=eq.<skill_uuid>
-&is_published=eq.true
+&status=eq.live
 &deleted_at=is.null
 ```
 
@@ -300,7 +300,7 @@ if (profile.role !== 'admin') {
   },
   "explanation": "2 + 2 equals 4",
   "points": 1,
-  "is_published": false
+  "status": "draft"
 }
 ```
 

@@ -10,6 +10,12 @@
 
 **File Purpose**: Single source of truth for AI coding agents - architecture, rules, and patterns.
 
+**Domain-Specific Guides**:
+- **Database**: `DATABASE_COMPLETE.md` (Schema, RLS, RPCs)
+- **API**: `API_CONTRACTS.md` (Endpoints, Auth, Sync)
+- **Student App**: `STUDENT_APP_COMPLETE.md` (Flutter, Drift, Offline Sync)
+- **Admin Panel**: `ADMIN_PANEL_COMPLETE.md` (React, Context, CRUD)
+
 **When to use this file**:
 - Starting any new feature (check locked tech stack first)
 - Unsure which pattern to follow (code patterns library)
@@ -60,12 +66,12 @@ flutter analyze && cd admin-panel && npm run build
 **Completed Phases**:
 - ✅ Phase -1: Environment validated (Flutter, Node, Supabase CLI)
 - ✅ Phase 0: Projects bootstrapped (Flutter & React initialized)
-- ✅ Phase 1: Database schema deployed (migrations + RLS + seed data)
-- ✅ Phase 2: Student app core loop (offline-first with Drift sync)
-- ✅ Phase 3: Admin panel MVP (CRUD + publish workflow)
-- ✅ Phase 4: Hardening (observability + CI/CD)
+- ✅ Phase 1: Data Model + Contracts (Documentation suite complete)
+- 🚧 Phase 2: Student app core loop (Pending implementation)
+- ⬜ Phase 3: Admin panel MVP (Pending implementation)
+- ⬜ Phase 4: Hardening (Pending implementation)
 
-**Current Phase**: All phases completed - maintenance mode
+**Current Phase**: Phase 1 (Documentation & Contracts) - transitioning to Phase 2
 
 ### Key Architecture Decisions
 

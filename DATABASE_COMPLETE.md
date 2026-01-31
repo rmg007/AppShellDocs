@@ -86,6 +86,14 @@ CREATE TYPE public.user_role AS ENUM ('admin', 'student');
 
 **Usage**: `profiles.role`
 
+### content_status
+
+```sql
+CREATE TYPE public.content_status AS ENUM ('draft', 'live');
+```
+
+**Usage**: `domains.status`, `skills.status`, `questions.status`
+
 ### question_type
 
 ```sql
@@ -138,7 +146,7 @@ CREATE TABLE public.domains (
   title TEXT NOT NULL,
   description TEXT,
   sort_order INTEGER DEFAULT 0 NOT NULL,
-  is_published BOOLEAN DEFAULT FALSE NOT NULL,
+  status public.content_status DEFAULT 'draft'::public.content_status NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   deleted_at TIMESTAMPTZ
@@ -148,7 +156,7 @@ CREATE TABLE public.domains (
 **Key Points**:
 - `slug` must be lowercase alphanumeric + underscores
 - `sort_order` determines display order
-- `is_published` cascades to all child skills + questions
+- `status` cascades to all child skills + questions
 
 ### 3.3 skills
 
@@ -163,7 +171,7 @@ CREATE TABLE public.skills (
   description TEXT,
   difficulty_level INTEGER DEFAULT 1 CHECK (difficulty_level BETWEEN 1 AND 5),
   sort_order INTEGER DEFAULT 0 NOT NULL,
-  is_published BOOLEAN DEFAULT FALSE NOT NULL,
+  status public.content_status DEFAULT 'draft'::public.content_status NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   deleted_at TIMESTAMPTZ,
@@ -174,7 +182,7 @@ CREATE TABLE public.skills (
 **Key Points**:
 - `slug` unique within parent domain
 - `difficulty_level` 1-5 (1 = easiest)
-- `is_published` cascades to all child questions
+- `status` cascades to all child questions
 
 ### 3.4 questions
 
@@ -190,7 +198,7 @@ CREATE TABLE public.questions (
   solution JSONB NOT NULL,  -- Correct answer
   explanation TEXT,  -- Shown after answering
   points INTEGER DEFAULT 1 NOT NULL,
-  is_published BOOLEAN DEFAULT FALSE NOT NULL,
+  status public.content_status DEFAULT 'draft'::public.content_status NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   deleted_at TIMESTAMPTZ
@@ -244,7 +252,7 @@ CREATE POLICY "Admins full access to domains" ON public.domains
 
 CREATE POLICY "Students can read published domains" ON public.domains
   FOR SELECT 
-  USING (is_published AND deleted_at IS NULL);
+  USING (status = 'live' AND deleted_at IS NULL);
 
 -- Skills (same pattern)
 CREATE POLICY "Admins full access to skills" ON public.skills
@@ -254,7 +262,7 @@ CREATE POLICY "Admins full access to skills" ON public.skills
 
 CREATE POLICY "Students can read published skills" ON public.skills
   FOR SELECT 
-  USING (is_published AND deleted_at IS NULL);
+  USING (status = 'live' AND deleted_at IS NULL);
 
 -- Questions (same pattern)
 CREATE POLICY "Admins full access to questions" ON public.questions
@@ -264,7 +272,7 @@ CREATE POLICY "Admins full access to questions" ON public.questions
 
 CREATE POLICY "Students can read published questions" ON public.questions
   FOR SELECT 
-  USING (is_published AND deleted_at IS NULL);
+  USING (status = 'live' AND deleted_at IS NULL);
 ```
 
 ---
